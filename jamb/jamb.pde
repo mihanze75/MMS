@@ -7,12 +7,24 @@ final int NUM_DICE = 5;    //The number of dice used
 int[] rolls = new int[NUM_DICE]; //array to store dice roll
 int brojac = 0, brIgraca;
 final StringList ids = new StringList( new String[] {} );
+Table table;
+float lastDieY;
 
 void setup() {
   size(500, 500);
   unosBrojaIgraca();
   for(int i = 0; i < brIgraca; i++)
   {
+    table = new Table();
+  
+    table.addColumn("id");
+    table.addColumn("species");
+    table.addColumn("name");
+  
+    TableRow newRow = table.addRow();
+    newRow.setInt("id", table.lastRowIndex());
+    newRow.setString("species", "Panthera leo");
+    newRow.setString("name", "Lion");
     unosIgraca();
   }
     
@@ -130,7 +142,7 @@ void die_draw(int position, int value) {
    *   value - must be 1..6, the amount showing on that die
    */
   final float X_SPACING = (float)width/NUM_DICE; //X spacing of the dice
-  final float DIE_SIZE = X_SPACING*0.8; //width and height of one die
+  final float DIE_SIZE = X_SPACING*0.5; //width and height of one die
   final float X_LEFT_DIE = X_SPACING*0.1; //left side of the leftmost die
   final float Y_OFFSET = X_SPACING*0.15; //slight Y offset of the odd-numbered ones
   final float Y_POSITION = height-DIE_SIZE-Y_OFFSET; //Y coordinate of most dice
@@ -138,9 +150,17 @@ void die_draw(int position, int value) {
   final float PIP_DIAM = DIE_SIZE/5; //Diameter of the pips (dots)
  
   //From the constants above, and which die it is, find its top left corner
-  float dieX = X_LEFT_DIE+position*X_SPACING;
-  float dieY = Y_POSITION-Y_OFFSET*(position%2);
- 
+  //float dieX = X_LEFT_DIE+position*X_SPACING;
+  float dieX = 20;
+  //float dieY = Y_POSITION-Y_OFFSET*(position%2);
+  float dieY;
+  if(position == 0){
+    dieY = DIE_SIZE*position + 10;
+  }
+  else{
+    dieY = lastDieY + DIE_SIZE + 10;
+  }
+ lastDieY = dieY;
   //1.Draw a red square with a black outline
   stroke(0); //Black outline
   fill(0, 0, 0); //Black fill
