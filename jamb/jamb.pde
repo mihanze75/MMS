@@ -7,105 +7,30 @@ final int NUM_DICE = 5;    //The number of dice used
 int[] rolls = new int[NUM_DICE]; //array to store dice roll
 int brojac = 0, brIgraca;
 final StringList ids = new StringList( new String[] {} );
+StringList players = new StringList();
+int playerOnTurnIndex;
 Table table;
 float lastDieY;
 
-// variables needed for the form
-int numRows = 17;
-int numCols = 4;
-int[][] jambGrid = new int[numRows][numCols];
-int deltaX = 70;
-int deltaY = 30;
-int startPointX = 150;              // if you want to move the form a bit, just change startPointX and/or startPointY 
-int startPointY = 10;
-int x = startPointX;
-int y = startPointY;
+int rollingLeft = 3;
+String playerOnTurn;
 
-PFont Font1;
-PFont Font2;
+jambGrid[] gameInfo;
 
 void setup() {
   size(700, 700);
   unosBrojaIgraca();
+  gameInfo = new jambGrid[brIgraca];
   for(int i = 0; i < brIgraca; i++)
   {
-    table = new Table();
-  
-    table.addColumn("id");
-    table.addColumn("species");
-    table.addColumn("name");
-  
-    TableRow newRow = table.addRow();
-    newRow.setInt("id", table.lastRowIndex());
-    newRow.setString("species", "Panthera leo");
-    newRow.setString("name", "Lion");
-    unosIgraca();
+    unosIgraca(i);
   }
+     
+  // setting player 1 info
+  playerOnTurn = players.get(0);
+  playerOnTurnIndex = 0;
+  println("Na redu je " + playerOnTurn);
   
-  // ---------- drawing the form ----------
-  Font1 = createFont("Arial Bold", 15);
-  //Font2 = createFont("Arial Bold", 12);
-  fill(0, 0, 0);
-  //draw columns
-  for(int i = 0; i <= numCols; ++i){
-    if(i == 0 || i == 1 || i == numCols){
-      strokeWeight(3);
-    }
-    else{
-      strokeWeight(1);
-    }
-    line(x, y, x, y + (numRows * deltaY));
-    x += deltaX;
-  }
-  x = startPointX;
-  //draw rows
-  for(int i = 0; i <= numRows; ++i){
-    // for bolded rows
-    if(i == 0 || i == 1 || i == 7 || i == 8 || i == 10 || i == 11 || i == numRows - 1 || i == numRows){
-      strokeWeight(3);
-    }
-    else{
-      strokeWeight(1);
-    }
-    line(x, y, x + (numCols * deltaX), y);
-    y += deltaY;
-  }
-  y = startPointY;
-  
-  // putting text to the first column
-  textFont(Font1);
-  text("Player 1", x + 7, y + 20);
-  for(int i = 1; i <= 6; ++i){
-    text(str(i), x + 25, y + (deltaY *i) + 20);
-  }
-  text("Ukupno", x + 7, y + (deltaY * 7) + 20);
-  text("Max", x + 20, y + (deltaY * 8) + 20);
-  text("Min", x + 20, y + (deltaY * 9) + 20);
-  text("Ukupno", x + 7, y + (deltaY * 10) + 20);
-  text("Tris", x + 20, y + (deltaY * 11) + 20);
-  text("Skala", x + 20, y + (deltaY *12) + 20);
-  text("Full", x + 20, y + (deltaY *13) + 20);
-  text("Poker", x + 20, y + (deltaY *14) + 20);
-  text("Jamb", x + 20, y + (deltaY *15) + 20);
-  text("Ukupno", x + 7, y + (deltaY *16) + 20);
-  
-  // drawing margin fields for the sums
-  drawSumField(x + deltaX * numCols, y + deltaY * 7, false);
-  drawSumField(x + deltaX * numCols, y + deltaY * 10, false);
-  drawSumField(x + deltaX * numCols, y + deltaY * 16, false);
-  
-  // drawing total sum field
-  drawSumField(x + deltaX * numCols, y + deltaY * numRows, true);
-  
-  // putting triangles to the first row to show the required direction
-  noFill();
-  strokeWeight(1);
-  triangle(x + deltaX + 35, y + 10, x + deltaX + 30, y + 20, x + deltaX + 40, y + 20);
-  triangle(x + deltaX*2 + 30, y + 10, x + deltaX*2 + 40, y + 10, x + deltaX*2 + 35, y + 20);
-  triangle(x + deltaX*3 + 20, y + 10, x + deltaX*3 + 15, y + 20, x + deltaX*3 + 25, y + 20);
-  triangle(x + deltaX*3 + 30, y + 10, x + deltaX*3 + 40, y + 10, x + deltaX*3 + 35, y + 20);
-  // ---------- end of the form drawing ----------
-    
   //message_draw("Kliknite za bacanje!");
   dice_roll();
 }
@@ -168,7 +93,7 @@ void unosBrojaIgraca(){
     }
  
 }
-void unosIgraca(){
+void unosIgraca(int index){
    final String id = showInputDialog("Unesite ime igrača:");
  
   if (id == null)   exit();
@@ -176,29 +101,54 @@ void unosIgraca(){
   else if ("".equals(id)){
     showMessageDialog(null, "Prazan unos! Molimo unesite ime igrača.", 
     "Alert", ERROR_MESSAGE);
-    unosIgraca();
+    unosIgraca(index);
     }
     
     else if (ids.hasValue(id)){
     showMessageDialog(null, "Igrač " + id + "\" već postoji! Molimo unesite neko drugo ime:", 
     "Alert", ERROR_MESSAGE);
-    unosIgraca();
+    unosIgraca(index);
     }
  
    else {
     showMessageDialog(null, "Igrač " + id + "\" uspješno dodan!", 
     "Info", INFORMATION_MESSAGE);
     ids.append(id);
+    players.append(id);
+    gameInfo[index] = new jambGrid(index, 17, 4, 70, 30, 150, 10);
    }
 }
+
 void draw() {
+  background(220, 220, 220);
   for ( int d = 0; d < NUM_DICE; d++) {
     die_draw( d, rolls[d] );
   }
+  gameInfo[playerOnTurnIndex].drawGrid();
 }
  
-void mousePressed() {
+/*void mousePressed() {
   dice_roll();
+}*/
+
+// change of playerOnTurn will be handled in form functions, when the result is entered
+void keyPressed(){
+    if(key == 'A' || key == 'a'){
+      if(rollingLeft > 0){
+        dice_roll();
+        rollingLeft -= 1;
+      }
+     else{
+       println("Nema više bacanja za tebe!");
+       if(playerOnTurnIndex == brIgraca - 1){
+         playerOnTurnIndex = 0;
+       }
+       else{
+         playerOnTurnIndex += 1;
+       }
+       rollingLeft = 3;
+     }
+    }
 }
  
 void message_draw(String message) {
