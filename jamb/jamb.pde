@@ -127,9 +127,13 @@ void draw() {
   gameInfo[playerOnTurnIndex].drawGrid();
 }
  
-/*void mousePressed() {
-  dice_roll();
-}*/
+void mousePressed() {
+  //dice_roll();
+  println(str(mouseX) + " " + str(mouseY));
+  if(gameInfo[playerOnTurnIndex].check()){
+    return;
+  }
+}
 
 // change of playerOnTurn will be handled in form functions, when the result is entered
 void keyPressed(){

@@ -106,8 +106,18 @@ class jambGrid{
     }
   }
   
-  void mouseClicked(){
-    println("Mouse clicked");
+  public boolean check(){
+    if((mouseX > startPointX + deltaX && mouseX < startPointX + deltaX*numCols) && (mouseY > startPointY + deltaY && mouseY < startPointY + deltaY*numRows)){
+      println("Writing into form");
+      int column = (mouseX - deltaX - startPointX)/deltaX;
+      int row = (mouseY - deltaY - startPointY)/deltaY;
+      println("field: " + str(row) + " " + str(column));
+      return true;
+    }
+    else{
+      println("not in the form");
+      return false;
+    }
   }
   
 }
