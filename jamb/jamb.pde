@@ -33,6 +33,7 @@ void setup() {
   
   //message_draw("Kliknite za bacanje!");
   dice_roll();
+  
 }
 //je li broj unešen u dozvoljenom obliku
 int provjeriUnosBroja(String strings){
