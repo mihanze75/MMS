@@ -5,13 +5,14 @@ final int NUM_DICE = 5;    //The number of dice used
 
 /***  Variables  ***/
 int[] rolls = new int[NUM_DICE]; //array to store dice roll
-int brojac = 0, brIgraca;
+int brojac = 0, brIgraca, rezultat[] = {0,0,0,0,0,0}; 
 final StringList ids = new StringList( new String[] {} );
 StringList players = new StringList();
 int playerOnTurnIndex;
 Table table;
-float lastDieY;
-
+float DIE_SIZE,lastDieY;
+float[] pozicije = new float[NUM_DICE];  // positions of dices on canvas
+int[] rollingDice = {1,1,1,1,1}; // 1, if we want to roll the dice, 0 otherwise
 int rollingLeft = 3;
 String playerOnTurn;
 
@@ -32,7 +33,7 @@ void setup() {
   println("Na redu je " + playerOnTurn);
   
   //message_draw("Kliknite za bacanje!");
-  dice_roll();
+  //dice_roll();
   
 }
 //je li broj unešen u dozvoljenom obliku
@@ -78,6 +79,12 @@ void unosBrojaIgraca(){
           "Alert", ERROR_MESSAGE);
            unosBrojaIgraca();
        }
+       else if(broj > 6)
+       {
+          showMessageDialog(null, "Molimo unesite broj manji od 7.", 
+          "Alert", ERROR_MESSAGE);
+           unosBrojaIgraca();
+       }
        else 
        {
           showMessageDialog(null, "Broj igrača uspješno dodan!", 
@@ -106,13 +113,13 @@ void unosIgraca(int index){
     }
     
     else if (ids.hasValue(id)){
-    showMessageDialog(null, "Igrač " + id + "\" već postoji! Molimo unesite neko drugo ime:", 
+    showMessageDialog(null, "Igrač " + id + " već postoji! Molimo unesite neko drugo ime:", 
     "Alert", ERROR_MESSAGE);
     unosIgraca(index);
     }
  
    else {
-    showMessageDialog(null, "Igrač " + id + "\" uspješno dodan!", 
+    showMessageDialog(null, "Igrač " + id + " uspješno dodan!", 
     "Info", INFORMATION_MESSAGE);
     ids.append(id);
     players.append(id);
@@ -123,7 +130,8 @@ void unosIgraca(int index){
 void draw() {
   background(220, 220, 220);
   for ( int d = 0; d < NUM_DICE; d++) {
-    die_draw( d, rolls[d] );
+    //black color
+    die_draw( d, rolls[d], "black");
   }
   gameInfo[playerOnTurnIndex].drawGrid();
 }
@@ -131,6 +139,9 @@ void draw() {
 void mousePressed() {
   //dice_roll();
   println(str(mouseX) + " " + str(mouseY));
+  if(provjera()){
+    return;
+  }
   if(gameInfo[playerOnTurnIndex].check()){
     return;
   }
@@ -144,6 +155,8 @@ void keyPressed(){
         rollingLeft -= 1;
       }
      else{
+       showMessageDialog(null, "Nema više bacanja za tebe!", 
+         "Info", INFORMATION_MESSAGE);
        println("Nema više bacanja za tebe!");
        if(playerOnTurnIndex == brIgraca - 1){
          playerOnTurnIndex = 0;
@@ -151,11 +164,71 @@ void keyPressed(){
        else{
          playerOnTurnIndex += 1;
        }
+       
+       //zbroji rezultat
+       for(int i = 0; i < NUM_DICE; i++)
+       { 
+          if(rolls[i] == 1) rezultat[0]++;
+          if(rolls[i] == 2) rezultat[1]++;
+          if(rolls[i] == 3) rezultat[2]++;
+          if(rolls[i] == 4) rezultat[3]++;
+          if(rolls[i] == 5) rezultat[4]++;
+          if(rolls[i] == 6) rezultat[5]++;
+         //rezultat = rezultat + rolls[i];
+       } 
+       for(int i = 0; i < 6; i++)
+       { println("imamo " + rezultat[i] + " kocaka broj " + (i+1));
+       }
+       //println("Rez je : " + rezultat);
+       // novi igrač, vrati sve na početno 
        rollingLeft = 3;
+       
+       for(int i = 0; i < NUM_DICE; i++)
+       { 
+         rezultat[i] = 0;
+         rollingDice[i] = 1;
+       } 
+       //jos sestu kocku
+        rezultat[5] = 0;
+       //dice_roll();
      }
     }
 }
- 
+
+ boolean provjera(){
+   if(mouseX >= 20 && mouseX <= (20 + DIE_SIZE))
+   {
+       println("OK, X-os si pogodio");
+       for(int i = 0; i < NUM_DICE; i++)
+       {
+          if(mouseY >= pozicije[i] && mouseY <= (pozicije[i] + DIE_SIZE))
+          {  
+             println("Bravo, cak si i Y-os pogodio.");
+             // igrac hoce ili nece bacati kocku
+             if(rollingDice[i] ==  1) 
+             {  
+                //red color
+                //NIJE DOBRO! Samo se na klik ofarba :(
+                //fill(255,0,0);
+                //rect(20, pozicije[i] ,DIE_SIZE ,DIE_SIZE);
+                rollingDice[i] = 0;
+             }   
+             else 
+             {   
+                //black color
+                //fill(255,0,0);
+                //rect(20, pozicije[i] ,DIE_SIZE ,DIE_SIZE);
+                rollingDice[i] = 1;
+             }   
+             return true;
+          }
+       }
+       println("Ali nisi pogodio Y-os -.-");
+       return false;
+   }  
+   println("Fulao si X-os!!!!");
+   return false;
+ }
 void message_draw(String message) {
   //Display the given message in the centre of the window.
   textSize(24);
@@ -165,17 +238,21 @@ void message_draw(String message) {
  
 void dice_roll() {
   for (int i=0; i < NUM_DICE; i++) {
-    rolls[i]=1 + int(random(NUM_SIDES));
+    if(rollingDice[i] == 1)
+    {  
+       // println("evo " + i + "-ta kocka je zarolana");
+       rolls[i]=1 + int(random(NUM_SIDES));
+    }   
   }
 }
  
-void die_draw(int position, int value) {
+void die_draw(int position, int value, String colour) {
   /* Draw one die in the canvas.
    *   position - must be 0..NUM_DICE-1, indicating which die is being drawn
    *   value - must be 1..6, the amount showing on that die
    */
   final float X_SPACING = (float)width/NUM_DICE; //X spacing of the dice
-  final float DIE_SIZE = X_SPACING*0.5; //width and height of one die
+  DIE_SIZE = X_SPACING*0.5; //width and height of one die
   final float X_LEFT_DIE = X_SPACING*0.1; //left side of the leftmost die
   final float Y_OFFSET = X_SPACING*0.15; //slight Y offset of the odd-numbered ones
   final float Y_POSITION = height-DIE_SIZE-Y_OFFSET; //Y coordinate of most dice
@@ -194,9 +271,16 @@ void die_draw(int position, int value) {
     dieY = lastDieY + DIE_SIZE + 10;
   }
  lastDieY = dieY;
-  //1.Draw a red square with a black outline
+ // pamti Y poziciju, X pozicija je uvijek ista : 20, kao i velicina kocke : DIE_SIZE
+  pozicije[position] = dieY;
+ 
+  //1.Draw a square
   stroke(0); //Black outline
+  // determine if dice is clicked or not
+  if(colour == "black")
   fill(0, 0, 0); //Black fill
+  if(colour == "red")
+  fill(255, 0, 0); //Red fill
   rect(dieX, dieY, DIE_SIZE, DIE_SIZE);
  
   //2.Draw the pips (dots)
