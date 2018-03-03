@@ -122,6 +122,7 @@ class jambGrid{
     }
   }
   
+  // ispisuje sve igrace i igraca koji je na potezu
   void showPlayers() {
   textAlign(LEFT);
   text("Popis igraca:", 3*width/4,30);

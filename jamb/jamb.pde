@@ -33,7 +33,7 @@ void setup() {
   println("Na redu je " + playerOnTurn);
   
   //message_draw("Kliknite za bacanje!");
-  //dice_roll();
+  dice_roll();
   
 }
 //je li broj unešen u dozvoljenom obliku
@@ -131,9 +131,13 @@ void draw() {
   background(220, 220, 220);
   for ( int d = 0; d < NUM_DICE; d++) {
     //black color
-    die_draw( d, rolls[d], "black");
+    if(rollingDice[d] == 1)
+      die_draw( d, rolls[d], "black");
+    else
+      die_draw( d, rolls[d], "red");
   }
   gameInfo[playerOnTurnIndex].drawGrid();
+  printUsedDices();
 }
  
 void mousePressed() {
@@ -205,7 +209,7 @@ void keyPressed(){
           {  
              println("Bravo, cak si i Y-os pogodio.");
              // igrac hoce ili nece bacati kocku
-             if(rollingDice[i] ==  1) 
+             if(rollingDice[i] ==  1 && rollingLeft != 3) 
              {  
                 //red color
                 //NIJE DOBRO! Samo se na klik ofarba :(
@@ -229,6 +233,35 @@ void keyPressed(){
    println("Fulao si X-os!!!!");
    return false;
  }
+ 
+void printUsedDices(){
+   text("Kockice koje bacaš:", 20, 550);
+   int j = 1;
+   for(int i = 0; i < 5; i++)
+   {
+     if(rollingDice[i] == 1)
+     {
+       text(str(i), 20, 550+20*j);
+       j++;
+     }
+       
+   }
+   
+   j = 1;
+   fill(255,0,0);
+   text("Odvojene kockice:", 200, 550);
+   for(int i = 0; i < 5; i++)
+   {
+    if(rollingDice[i] == 0)
+    {
+      text(str(i), 200, 550+20*j);
+      j++;
+    }
+   }
+   
+     
+ }
+ 
 void message_draw(String message) {
   //Display the given message in the centre of the window.
   textSize(24);
