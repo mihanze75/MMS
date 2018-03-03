@@ -92,6 +92,8 @@ class jambGrid{
   triangle(x + deltaX*2 + 30, y + 10, x + deltaX*2 + 40, y + 10, x + deltaX*2 + 35, y + 20);
   triangle(x + deltaX*3 + 20, y + 10, x + deltaX*3 + 15, y + 20, x + deltaX*3 + 25, y + 20);
   triangle(x + deltaX*3 + 30, y + 10, x + deltaX*3 + 40, y + 10, x + deltaX*3 + 35, y + 20);
+  
+  showPlayers();
   }
   // ---------- end of the form drawing ----------
   
@@ -109,5 +111,23 @@ class jambGrid{
   void mouseClicked(){
     println("Mouse clicked");
   }
+  
+  void showPlayers() {
+  textAlign(LEFT);
+  text("Popis igraca:", 3*width/4,30);
+  
+  for(int i = 0; i < brIgraca; i++)
+  {
+    String item = ids.get(i);
+    textAlign(LEFT);
+    text(item, 3*width/4,30+(i+1)*20);
+  }
+  
+  textAlign(LEFT);
+  text("Trenutno na potezu:", 3*width/4,230);
+  String currentPlayer = players.get(playerOnTurnIndex);
+  textAlign(LEFT);
+  text(currentPlayer, 3*width/4,250);
+}
   
 }
