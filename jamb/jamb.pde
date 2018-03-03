@@ -16,6 +16,8 @@ int[] rollingDice = {1,1,1,1,1}; // 1, if we want to roll the dice, 0 otherwise
 int rollingLeft = 3;
 String playerOnTurn;
 
+Die[] dice = new Die[5];
+
 jambGrid[] gameInfo;
 
 void setup() {
@@ -32,8 +34,15 @@ void setup() {
   playerOnTurnIndex = 0;
   println("Na redu je " + playerOnTurn);
   
+  final float X_SPACING = (float)width/NUM_DICE; //X spacing of the dice
+  DIE_SIZE = X_SPACING*0.5; //width and height of one die
+  float dieY = 10;
   //message_draw("Kliknite za bacanje!");
-  dice_roll();
+  for(int i=0; i<5; i++)
+  {
+    dice[i] = new Die(i+1, 20, dieY, DIE_SIZE);
+    dieY = dieY+10+DIE_SIZE;
+  }
   
 }
 //je li broj unešen u dozvoljenom obliku
@@ -130,11 +139,7 @@ void unosIgraca(int index){
 void draw() {
   background(220, 220, 220);
   for ( int d = 0; d < NUM_DICE; d++) {
-    //black color
-    if(rollingDice[d] == 1)
-      die_draw( d, rolls[d], "black");
-    else
-      die_draw( d, rolls[d], "red");
+    dice[d].DrawDie();
   }
   gameInfo[playerOnTurnIndex].drawGrid();
   printUsedDices();
@@ -143,8 +148,12 @@ void draw() {
 void mousePressed() {
   //dice_roll();
   println(str(mouseX) + " " + str(mouseY));
-  if(provjera()){
-    return;
+  for(int i = 0; i<5;i++)
+  {
+    if(dice[i].IsInsideDie(mouseX,mouseY))
+    {  
+      dice[i].ChangeRollingDieProperty();
+    }
   }
   if(gameInfo[playerOnTurnIndex].check()){
     return;
@@ -155,7 +164,10 @@ void mousePressed() {
 void keyPressed(){
     if(key == 'A' || key == 'a'){
       if(rollingLeft > 0){
-        dice_roll();
+        for(int i=0;i<5;i++)
+        {
+          dice[i].RollTheDie();
+        }
         rollingLeft -= 1;
       }
      else{
@@ -191,6 +203,10 @@ void keyPressed(){
        { 
          rezultat[i] = 0;
          rollingDice[i] = 1;
+         if(!dice[i].DieRolls())
+         {
+           dice[i].ChangeRollingDieProperty();
+         }
        } 
        //jos sestu kocku
         rezultat[5] = 0;
@@ -198,48 +214,13 @@ void keyPressed(){
      }
     }
 }
-
- boolean provjera(){
-   if(mouseX >= 20 && mouseX <= (20 + DIE_SIZE))
-   {
-       println("OK, X-os si pogodio");
-       for(int i = 0; i < NUM_DICE; i++)
-       {
-          if(mouseY >= pozicije[i] && mouseY <= (pozicije[i] + DIE_SIZE))
-          {  
-             println("Bravo, cak si i Y-os pogodio.");
-             // igrac hoce ili nece bacati kocku
-             if(rollingDice[i] ==  1 && rollingLeft != 3) 
-             {  
-                //red color
-                //NIJE DOBRO! Samo se na klik ofarba :(
-                //fill(255,0,0);
-                //rect(20, pozicije[i] ,DIE_SIZE ,DIE_SIZE);
-                rollingDice[i] = 0;
-             }   
-             else 
-             {   
-                //black color
-                //fill(255,0,0);
-                //rect(20, pozicije[i] ,DIE_SIZE ,DIE_SIZE);
-                rollingDice[i] = 1;
-             }   
-             return true;
-          }
-       }
-       println("Ali nisi pogodio Y-os -.-");
-       return false;
-   }  
-   println("Fulao si X-os!!!!");
-   return false;
- }
  
 void printUsedDices(){
    text("Kockice koje bacaš:", 20, 550);
    int j = 1;
    for(int i = 0; i < 5; i++)
    {
-     if(rollingDice[i] == 1)
+     if(dice[i].DieRolls())
      {
        text(str(i), 20, 550+20*j);
        j++;
@@ -252,7 +233,7 @@ void printUsedDices(){
    text("Odvojene kockice:", 200, 550);
    for(int i = 0; i < 5; i++)
    {
-    if(rollingDice[i] == 0)
+    if(!dice[i].DieRolls())
     {
       text(str(i), 200, 550+20*j);
       j++;
@@ -267,85 +248,4 @@ void message_draw(String message) {
   textSize(24);
   fill(0);
   text(message, (width-textWidth(message))/2, height/2);
-}
- 
-void dice_roll() {
-  for (int i=0; i < NUM_DICE; i++) {
-    if(rollingDice[i] == 1)
-    {  
-       // println("evo " + i + "-ta kocka je zarolana");
-       rolls[i]=1 + int(random(NUM_SIDES));
-    }   
-  }
-}
- 
-void die_draw(int position, int value, String colour) {
-  /* Draw one die in the canvas.
-   *   position - must be 0..NUM_DICE-1, indicating which die is being drawn
-   *   value - must be 1..6, the amount showing on that die
-   */
-  final float X_SPACING = (float)width/NUM_DICE; //X spacing of the dice
-  DIE_SIZE = X_SPACING*0.5; //width and height of one die
-  final float X_LEFT_DIE = X_SPACING*0.1; //left side of the leftmost die
-  final float Y_OFFSET = X_SPACING*0.15; //slight Y offset of the odd-numbered ones
-  final float Y_POSITION = height-DIE_SIZE-Y_OFFSET; //Y coordinate of most dice
-  final float PIP_OFFSET = DIE_SIZE/3.5; //Distance from centre to pips, and between pips
-  final float PIP_DIAM = DIE_SIZE/5; //Diameter of the pips (dots)
- 
-  //From the constants above, and which die it is, find its top left corner
-  //float dieX = X_LEFT_DIE+position*X_SPACING;
-  float dieX = 20;
-  //float dieY = Y_POSITION-Y_OFFSET*(position%2);
-  float dieY;
-  if(position == 0){
-    dieY = DIE_SIZE*position + 10;
-  }
-  else{
-    dieY = lastDieY + DIE_SIZE + 10;
-  }
- lastDieY = dieY;
- // pamti Y poziciju, X pozicija je uvijek ista : 20, kao i velicina kocke : DIE_SIZE
-  pozicije[position] = dieY;
- 
-  //1.Draw a square
-  stroke(0); //Black outline
-  // determine if dice is clicked or not
-  if(colour == "black")
-  fill(0, 0, 0); //Black fill
-  if(colour == "red")
-  fill(255, 0, 0); //Red fill
-  rect(dieX, dieY, DIE_SIZE, DIE_SIZE);
- 
-  //2.Draw the pips (dots)
-  fill(255); //White dots
-  stroke(255); //White outline
- 
-  //The centre dot (if the value is odd)
-  if (value%2 == 1){
-    ellipse(dieX+DIE_SIZE/2, dieY+DIE_SIZE/2, PIP_DIAM, PIP_DIAM);
-  }
- 
-  //The top-right and bottom-left dots (if the value is more than 1)
-  if (value>1) {
-    ellipse(dieX+DIE_SIZE/2-PIP_OFFSET, 
-      dieY+DIE_SIZE/2+PIP_OFFSET, PIP_DIAM, PIP_DIAM);
-    ellipse(dieX+DIE_SIZE/2+PIP_OFFSET, 
-      dieY+DIE_SIZE/2-PIP_OFFSET, PIP_DIAM, PIP_DIAM);
-  }
- 
-  //The bottom-right and top-left dots (if the value is more than 3)
-  if (value>3) {
-    ellipse(dieX+DIE_SIZE/2+PIP_OFFSET, 
-      dieY+DIE_SIZE/2+PIP_OFFSET, PIP_DIAM, PIP_DIAM);
-    ellipse(dieX+DIE_SIZE/2-PIP_OFFSET, 
-      dieY+DIE_SIZE/2-PIP_OFFSET, PIP_DIAM, PIP_DIAM);
-  }
- 
-  //The left and right dots (only if the value is 6)
-  if (value==6) {
-    ellipse(dieX+DIE_SIZE/2-PIP_OFFSET, 
-      dieY+DIE_SIZE/2, PIP_DIAM, PIP_DIAM);
-    ellipse(dieX+DIE_SIZE/2+PIP_OFFSET, 
-      dieY+DIE_SIZE/2, PIP_DIAM, PIP_DIAM);
-  }
 }
