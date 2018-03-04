@@ -21,7 +21,7 @@ Die[] dice = new Die[5];
 jambGrid[] gameInfo;
 
 void setup() {
-  size(800, 700);
+  size(850, 700);
   unosBrojaIgraca();
   gameInfo = new jambGrid[brIgraca];
   for(int i = 0; i < brIgraca; i++)
@@ -34,8 +34,7 @@ void setup() {
   playerOnTurnIndex = 0;
   println("Na redu je " + playerOnTurn);
   
-  //final float X_SPACING = (float)width/NUM_DICE; //X spacing of the dice
-  final float X_SPACING = 130;
+  final float X_SPACING = (float)width/NUM_DICE; //X spacing of the dice
   DIE_SIZE = X_SPACING*0.5; //width and height of one die
   float dieY = 10;
   //message_draw("Kliknite za bacanje!");
@@ -112,14 +111,9 @@ void unosBrojaIgraca(){
  
 }
 void unosIgraca(int index){
-   final String id = showInputDialog("Unesite ime igrača (najviše 8 znakova):");
+   final String id = showInputDialog("Unesite ime igrača:");
  
   if (id == null)   exit();
-  
-  else if(id.length() > 8){
-    showMessageDialog(null, "Ime može imati najviše 8 znakova.", "Alert", ERROR_MESSAGE);
-    unosIgraca(index);
-  }
  
   else if ("".equals(id)){
     showMessageDialog(null, "Prazan unos! Molimo unesite ime igrača.", 
@@ -138,7 +132,7 @@ void unosIgraca(int index){
     "Info", INFORMATION_MESSAGE);
     ids.append(id);
     players.append(id);
-    gameInfo[index] = new jambGrid(id, index, 17, 4, 70, 30, 130, 10);
+    gameInfo[index] = new jambGrid(id,index, 17, 4, 80, 30, 150, 10);
    }
 }
 
@@ -160,34 +154,43 @@ void restoreResult(){
 
 void draw() {
   background(220, 220, 220);
-  //background(176, 224, 230);
   for ( int d = 0; d < NUM_DICE; d++) {
     dice[d].DrawDie();
   }
   gameInfo[playerOnTurnIndex].drawGrid();
   printUsedDices();
+  printNumberOfRollingsLeft();
 }
  
 void mousePressed() {
   //dice_roll();
   println(str(mouseX) + " " + str(mouseY));
-  for(int i = 0; i<5;i++)
-  {
-    if(dice[i].IsInsideDie(mouseX,mouseY))
-    {  
-      dice[i].ChangeRollingDieProperty();
-    }
-  }
   
-  // update results before sending it to the form
-  checkCurrentResult();
-  if(gameInfo[playerOnTurnIndex].check(rezultat)){
-    return;
-  }
+   // ako je ostalo 3 bacanja, onda na početku mora baciti kocku, ne smije uzeti kocke koje je igrac prije njega dobio
+    if(rollingLeft == 3){
+      
+          showMessageDialog(null, "Molimo zavrtite kockicu!", 
+         "Info", INFORMATION_MESSAGE);
+    }
+    else{
+         for(int i = 0; i<5;i++)
+         {    
+              if(dice[i].IsInsideDie(mouseX,mouseY))
+              {  
+                 dice[i].ChangeRollingDieProperty();
+              }
+         }
+         // update results before sending it to the form
+         checkCurrentResult();
+         if(gameInfo[playerOnTurnIndex].check(rezultat)){
+         return;
+         }
+    }
 }
 
 // change of playerOnTurn will be handled in form functions, when the result is entered
 void keyPressed(){
+  
     if(key == 'A' || key == 'a'){
       if(rollingLeft > 0){
         for(int i=0;i<5;i++)
@@ -196,6 +199,7 @@ void keyPressed(){
           println(dice[i].dieNumber);
         }
         rollingLeft -= 1;
+        
       }
      else{
        showMessageDialog(null, "Nema više bacanja za tebe!", 
@@ -267,4 +271,9 @@ void message_draw(String message) {
   textSize(24);
   fill(0);
   text(message, (width-textWidth(message))/2, height/2);
+}
+
+void printNumberOfRollingsLeft(){
+  
+   text("Imaš još " + rollingLeft + " pokušaja.", 630,350);
 }
