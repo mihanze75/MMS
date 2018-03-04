@@ -34,7 +34,8 @@ void setup() {
   playerOnTurnIndex = 0;
   println("Na redu je " + playerOnTurn);
   
-  final float X_SPACING = (float)width/NUM_DICE; //X spacing of the dice
+  //final float X_SPACING = (float)width/NUM_DICE; //X spacing of the dice
+  final float X_SPACING = 140;
   DIE_SIZE = X_SPACING*0.5; //width and height of one die
   float dieY = 10;
   //message_draw("Kliknite za bacanje!");
@@ -111,9 +112,15 @@ void unosBrojaIgraca(){
  
 }
 void unosIgraca(int index){
-   final String id = showInputDialog("Unesite ime igrača:");
+   final String id = showInputDialog("Unesite ime igrača (najviše 8 znakova):");
  
   if (id == null)   exit();
+  
+  else if(id.length() > 8){
+     showMessageDialog(null, "Ime može imati najviše 8 znakova", 
+    "Alert", ERROR_MESSAGE);
+    unosIgraca(index);
+  }
  
   else if ("".equals(id)){
     showMessageDialog(null, "Prazan unos! Molimo unesite ime igrača.", 
@@ -132,7 +139,7 @@ void unosIgraca(int index){
     "Info", INFORMATION_MESSAGE);
     ids.append(id);
     players.append(id);
-    gameInfo[index] = new jambGrid(id,index, 17, 4, 80, 30, 150, 10);
+    gameInfo[index] = new jambGrid(id,index, 17, 4, 80, 30, 130, 10);
    }
 }
 

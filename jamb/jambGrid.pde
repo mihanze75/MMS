@@ -465,10 +465,10 @@ class jambGrid{
   }
   
   textAlign(LEFT);
-  text("Trenutno na potezu:", startPointX + deltaX * numCols + 175,230);
+  text("Trenutno na potezu:", startPointX + deltaX * numCols + 100,230);
   String currentPlayer = players.get(playerOnTurnIndex);
   textAlign(LEFT);
-  text(currentPlayer, startPointX + deltaX * numCols + 175,250);
+  text(currentPlayer, startPointX + deltaX * numCols + 100,250);
 }
   
 }
