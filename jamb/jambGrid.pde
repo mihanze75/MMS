@@ -20,6 +20,9 @@ class jambGrid{
   int sumMinMax;
   int sumCombinations;
   int sumAllTogether;
+  
+  // this array keeps track of the columns that have already been added thirty points in updateFieldWithNumbers method
+  int[] thirtyPointsAdded;
   // 
   
   jambGrid(int _player, int _numRows, int _numCols, int _deltaX, int _deltaY, int _startPointX, int _startPointY){
@@ -54,6 +57,8 @@ class jambGrid{
     sumMinMax = 0;
     sumCombinations = 0;
     sumAllTogether = 0;
+    
+    thirtyPointsAdded = new int[numCols - 1];
   }
   
   // ---------- drawing the form ----------
@@ -183,6 +188,27 @@ class jambGrid{
       if(row == 7 || row == 8){
         updateMinMax(row, column, diceResults);
       }
+      
+      if(row == 10){
+        updateTris(row, column, diceResults);
+      }
+      
+      if(row == 11){
+        updateSkala(row, column, diceResults);
+      }
+      
+      if(row == 12){
+        updateFull(row, column, diceResults);
+      }
+      
+      if(row == 13){
+        updatePoker(row, column, diceResults);
+      }
+      
+      if(row == 14){
+        updateJamb(row, column, diceResults);  
+      }
+      
       return true;
     }
     else{
@@ -240,10 +266,11 @@ class jambGrid{
     sumNumbers += jambResults[row][column];
     sumAllTogether += jambResults[row][column];
     
-    if(jambResults[6][column] >= 60){
+    if(jambResults[6][column] >= 60 && thirtyPointsAdded[column] == 0){
       jambResults[6][column] += 30;
       sumNumbers += 30;
       sumAllTogether += 30;
+      thirtyPointsAdded[column] = 1;
     }
     
     // checking if fields with ones, Min and Max are filled, and if yes, then update sums
@@ -257,7 +284,7 @@ class jambGrid{
   public void updateMinMax(int row, int column, int[] diceResults){
      int sum = 0;
      for(int i = 0; i < diceResults.length; ++i){
-       sum += diceResults[i];
+       sum += diceResults[i]*(i + 1);
      }
      
      jambResults[row][column] = sum;
@@ -275,6 +302,118 @@ class jambGrid{
     
     sumMinMax += jambResults[9][column];
     sumAllTogether += jambResults[9][column];
+  }
+  
+  public void updateTris(int row, int column, int[] diceResults){
+    int result = 0;
+    for(int i = 0; i < diceResults.length; ++i){
+      if(diceResults[i] >= 3){
+        result += 3*(i + 1);
+        result += 10;
+      }
+    }
+    
+    jambResults[row][column] = result;
+    
+    if(result != 0){
+      updateDownSums(row, column);
+    }
+  }
+  
+  public void updateSkala(int row, int column, int[] diceResults){
+    int result = 0;
+    int i;
+    // first check for velika skala :)
+    for(i = 1; i < diceResults.length; ++i){
+      if(diceResults[i] == 0){
+        break;
+      }
+    }
+    if(i == diceResults.length){
+      result += 40;
+    }
+    else{
+      for(i = 0; i < diceResults.length - 1; ++i){
+        if(diceResults[i] == 0){
+          break;
+        }
+      }
+      
+      if(i == diceResults.length - 1){
+        result += 30;
+      }
+    }
+    
+    jambResults[row][column] = result;
+    if(result > 0){
+      updateDownSums(row, column);
+    }
+  }
+  
+  public void updateFull(int row, int column, int[] diceResults){
+    int result = 0;
+    boolean twos = false;
+    boolean threes = false;
+    
+    for(int i = 0; i < diceResults.length; ++i){
+      if(diceResults[i] == 2){
+        twos = true;
+        result += (i + 1) * 2;
+      }
+      if(diceResults[i] == 3){
+        threes = true;
+        result += (i + 1) * 3;
+      } 
+    }
+    
+    if(twos && threes){
+      result += 30;
+      jambResults[row][column] = result;
+      updateDownSums(row, column);
+    }
+    
+    else{
+      jambResults[row][column] = result;
+    }
+  }
+  
+  public void updatePoker(int row, int column, int[] diceResults){
+    int result = 0;
+    int i;
+    for(i = 0; i < diceResults.length; ++i){
+      if(diceResults[i] >= 4){
+        result += (i + 1) * 4;
+        result += 40;
+      }
+    }
+    
+    jambResults[row][column] = result;
+    if(result > 0){
+      updateDownSums(row, column);
+    }
+  }
+  
+    public void updateJamb(int row, int column, int[] diceResults){
+    int result = 0;
+    int i;
+    for(i = 0; i < diceResults.length; ++i){
+      if(diceResults[i] == 5){
+        result += (i + 1) * 5;
+        result += 50;
+      }
+    }
+    
+    jambResults[row][column] = result;
+    if(result > 0){
+      updateDownSums(row, column);
+    }
+  }
+  
+  // down sums are the sums on the bottom of the form
+  public void updateDownSums(int row, int column){
+    jambResults[15][column] += jambResults[row][column];
+    sumCombinations += jambResults[row][column];
+    sumAllTogether += jambResults[row][column];
   }
   
   // ispisuje sve igrace i igraca koji je na potezu
