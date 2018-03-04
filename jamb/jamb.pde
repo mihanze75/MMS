@@ -9,6 +9,7 @@ int brojac = 0, brIgraca, rezultat[] = {0,0,0,0,0,0};
 final StringList ids = new StringList( new String[] {} );
 StringList players = new StringList();
 int playerOnTurnIndex;
+int playerGridShown;
 Table table;
 float DIE_SIZE,lastDieY;
 float[] pozicije = new float[NUM_DICE];  // positions of dices on canvas
@@ -16,9 +17,12 @@ int[] rollingDice = {1,1,1,1,1}; // 1, if we want to roll the dice, 0 otherwise
 int rollingLeft = 3;
 String playerOnTurn;
 
-Die[] dice = new Die[5];
+Die[] dice = new Die[NUM_DICE];
+emptyDie[] emptyDice = new emptyDie[NUM_DICE];
 
 jambGrid[] gameInfo;
+
+boolean nacrtano = false;
 
 void setup() {
   size(850, 700);
@@ -32,6 +36,7 @@ void setup() {
   // setting player 1 info
   playerOnTurn = players.get(0);
   playerOnTurnIndex = 0;
+  playerGridShown= 0;
   println("Na redu je " + playerOnTurn);
   
   //final float X_SPACING = (float)width/NUM_DICE; //X spacing of the dice
@@ -43,6 +48,13 @@ void setup() {
   {
     dice[i] = new Die(i+1, 20, dieY, DIE_SIZE);
     dieY = dieY+10+DIE_SIZE;
+  }
+  
+  float dieYEmpty = 10;
+  for(int i=0; i<5; i++)
+  {
+    emptyDice[i] = new emptyDie(20, dieYEmpty, DIE_SIZE);
+    dieYEmpty = dieYEmpty+10+DIE_SIZE;
   }
   
 }
@@ -159,13 +171,47 @@ void restoreResult(){
   }
 }
 
+void stopDrawing(int ms){
+     noLoop();
+    try{
+    Thread.sleep(ms);
+    playerGridShown = playerOnTurnIndex;
+    nacrtano = false;
+    loop();
+    playerGridShown = playerOnTurnIndex;
+    }
+    catch(Exception e){}
+}
+
 void draw() {
   background(220, 220, 220);
-  for ( int d = 0; d < NUM_DICE; d++) {
-    dice[d].DrawDie();
+  if(playerOnTurnIndex != playerGridShown && nacrtano){
+    stopDrawing(2000);
   }
-  gameInfo[playerOnTurnIndex].drawGrid();
-  printUsedDices();
+  if(playerOnTurnIndex != playerGridShown && !nacrtano){
+    gameInfo[playerGridShown].drawGrid();
+    nacrtano = true;
+  }
+  
+  if(rollingLeft < 3){
+    for ( int d = 0; d < NUM_DICE; d++) {
+      dice[d].DrawDie();
+    }
+  }
+  else{
+    for(int d=0; d < NUM_DICE; d++)
+    {
+      emptyDice[d].DrawEmptyDie();
+    }  
+  }
+  if(playerOnTurnIndex == playerGridShown){
+    gameInfo[playerOnTurnIndex].drawGrid();
+  }
+  /*else{
+    gameInfo[playerGridShown].drawGrid();
+    playerGridShown = playerOnTurnIndex;
+  }
+  printUsedDices();*/
   printNumberOfRollingsLeft();
 }
  
@@ -174,12 +220,12 @@ void mousePressed() {
   println(str(mouseX) + " " + str(mouseY));
   
    // ako je ostalo 3 bacanja, onda na početku mora baciti kocku, ne smije uzeti kocke koje je igrac prije njega dobio
-    if(rollingLeft == 3){
+    /*if(rollingLeft == 3){
       
           showMessageDialog(null, "Molimo zavrtite kockicu!", 
          "Info", INFORMATION_MESSAGE);
-    }
-    else{
+    }*/
+    //else{
          for(int i = 0; i<5;i++)
          {    
               if(dice[i].IsInsideDie(mouseX,mouseY))
@@ -189,10 +235,35 @@ void mousePressed() {
          }
          // update results before sending it to the form
          checkCurrentResult();
-         if(gameInfo[playerOnTurnIndex].check(rezultat)){
-         return;
+         if(rollingLeft < 3){
+           if(gameInfo[playerOnTurnIndex].check(rezultat)){
+             if(playerOnTurnIndex == brIgraca - 1){
+               playerOnTurnIndex = 0;
+             }
+             else{
+               playerOnTurnIndex += 1;
+             }
+             
+             for(int i = 0; i < 6; i++)
+             { println("imamo " + rezultat[i] + " kocaka broj " + (i+1));
+             }
+             //println("Rez je : " + rezultat);
+             // novi igrač, vrati sve na početno 
+             rollingLeft = 3;
+             
+             for(int i = 0; i < NUM_DICE; i++)
+             { 
+               rezultat[i] = 0;
+               rollingDice[i] = 1;
+               if(!dice[i].DieRolls())
+               {
+                 dice[i].ChangeRollingDieProperty();
+               }
+             }
+             rezultat[5] = 0;
+           return;
+           }
          }
-    }
 }
 
 // change of playerOnTurn will be handled in form functions, when the result is entered
@@ -209,40 +280,9 @@ void keyPressed(){
         
       }
      else{
-       showMessageDialog(null, "Nema više bacanja za tebe!", 
-         "Info", INFORMATION_MESSAGE);
-       println("Nema više bacanja za tebe!");
-       if(playerOnTurnIndex == brIgraca - 1){
-         playerOnTurnIndex = 0;
-       }
-       else{
-         playerOnTurnIndex += 1;
-       }
-       
-       //zbroji rezultat
-       checkCurrentResult();
-       
-       for(int i = 0; i < 6; i++)
-       { println("imamo " + rezultat[i] + " kocaka broj " + (i+1));
-       }
-       //println("Rez je : " + rezultat);
-       // novi igrač, vrati sve na početno 
-       rollingLeft = 3;
-       
-       for(int i = 0; i < NUM_DICE; i++)
-       { 
-         rezultat[i] = 0;
-         rollingDice[i] = 1;
-         if(!dice[i].DieRolls())
-         {
-           dice[i].ChangeRollingDieProperty();
-         }
-       } 
-       //jos sestu kocku
-        rezultat[5] = 0;
-       //dice_roll();
-     }
+
     }
+}
 }
  
 void printUsedDices(){
