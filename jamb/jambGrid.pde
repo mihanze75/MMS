@@ -212,6 +212,37 @@ class jambGrid{
         updateJamb(row, column, diceResults);  
       }
       
+      showMessageDialog(null, "Nema više bacanja za tebe!", 
+         "Info", INFORMATION_MESSAGE);
+       println("Nema više bacanja za tebe!");
+       if(playerOnTurnIndex == brIgraca - 1){
+         playerOnTurnIndex = 0;
+       }
+       else{
+         playerOnTurnIndex += 1;
+       }
+       
+       //zbroji rezultat
+       checkCurrentResult();
+       
+       for(int i = 0; i < 6; i++)
+       { println("imamo " + rezultat[i] + " kocaka broj " + (i+1));
+       }
+       //println("Rez je : " + rezultat);
+       // novi igrač, vrati sve na početno 
+       rollingLeft = 3;
+       
+       for(int i = 0; i < NUM_DICE; i++)
+       { 
+         rezultat[i] = 0;
+         rollingDice[i] = 1;
+         if(!dice[i].DieRolls())
+         {
+           dice[i].ChangeRollingDieProperty();
+         }
+       } 
+       //jos sestu kocku
+        rezultat[5] = 0;
       return true;
     }
     else{
