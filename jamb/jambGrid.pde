@@ -114,8 +114,8 @@ class jambGrid{
   // putting triangles to the first row to show the required direction
   noFill();
   strokeWeight(1);
-  triangle(x + deltaX + 35, y + 10, x + deltaX + 30, y + 20, x + deltaX + 40, y + 20);
-  triangle(x + deltaX*2 + 30, y + 10, x + deltaX*2 + 40, y + 10, x + deltaX*2 + 35, y + 20);
+  triangle(x + deltaX + 30, y + 10, x + deltaX + 40, y + 10, x + deltaX + 35, y + 20);
+  triangle(x + deltaX*2 + 35, y + 10, x + deltaX*2 + 30, y + 20, x + deltaX*2 + 40, y + 20);
   triangle(x + deltaX*3 + 20, y + 10, x + deltaX*3 + 15, y + 20, x + deltaX*3 + 25, y + 20);
   triangle(x + deltaX*3 + 30, y + 10, x + deltaX*3 + 40, y + 10, x + deltaX*3 + 35, y + 20);
   
@@ -206,7 +206,12 @@ class jambGrid{
       if(row == 0){
         return true;
       }
-      if(jambResults[row - 1][column] != -1){
+      if(row == 7 || row == 10){
+        if(jambResults[row - 2][column] != -1){
+          return true;
+        }
+      }
+      else if(jambResults[row - 1][column] != -1){
         return true;
       }
     }
@@ -215,7 +220,12 @@ class jambGrid{
       if(row == numRows - 2){
         return true;
       }
-      if(jambResults[row + 1][column] != -1){
+      if(row == 8 || row == 5){
+        if(jambResults[row + 2][column] != -1){
+          return true;
+        }
+      }
+      else if(jambResults[row + 1][column] != -1){
         return true;
       }
     }
@@ -235,6 +245,13 @@ class jambGrid{
       sumNumbers += 30;
       sumAllTogether += 30;
     }
+    
+    // checking if fields with ones, Min and Max are filled, and if yes, then update sums
+    if(row == 0){
+      if(jambResults[7][column] != -1 && jambResults[8][column] != -1){
+        multipleMinMax(column);
+      }
+    }
   }
   
   public void updateMinMax(int row, int column, int[] diceResults){
@@ -245,8 +262,19 @@ class jambGrid{
      
      jambResults[row][column] = sum;
      
-     // Mirnic, ovdje sam stala
-     //if  
+     if(jambResults[0][column] != -1 && jambResults[7][column] != -1 && jambResults[8][column] != -1){
+       multipleMinMax(column);
+     }  
+  }
+  
+  public void multipleMinMax(int column){
+    int difference = jambResults[7][column] - jambResults[8][column];
+    if(difference > 0){
+      jambResults[9][column] = difference * jambResults[0][column];
+    }
+    
+    sumMinMax += jambResults[9][column];
+    sumAllTogether += jambResults[9][column];
   }
   
   // ispisuje sve igrace i igraca koji je na potezu

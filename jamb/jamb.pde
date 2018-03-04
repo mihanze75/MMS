@@ -147,7 +147,7 @@ void checkCurrentResult(){
 
 // method to reset the result to zero when changing player on turn
 void restoreResult(){
-  for(int i = 0; i < NUM_DICE; ++i){
+  for(int i = 0; i < 6; ++i){
     rezultat[i] = 0;
   }
 }
