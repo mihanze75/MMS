@@ -12,8 +12,14 @@ class jambGrid{
   int y;
   
   PFont Font1;
+  PFont Font2;
   
   int player;
+  
+  int sumNumbers;
+  int sumMinMax;
+  int sumCombinations;
+  int sumAllTogether;
   // 
   
   jambGrid(int _player, int _numRows, int _numCols, int _deltaX, int _deltaY, int _startPointX, int _startPointY){
@@ -28,6 +34,26 @@ class jambGrid{
     x = _startPointX;
     y = _startPointY;
     Font1 = createFont("Arial Bold", 15);
+    Font2 = createFont("Arial", 15);
+    
+    // setting all fields to -1, except the fields that hold some sum
+    for(int i = 0; i < numRows - 1; ++i){
+      if(i == 6 || i == 9 || i == 15){
+        for(int j = 0; j < numCols - 1; ++j){
+          jambResults[i][j] = 0;
+        }
+      }
+      else{
+        for(int j = 0; j < numCols - 1; ++j){
+          jambResults[i][j] = -1;
+        }
+      }
+    }
+    
+    sumNumbers = 0;
+    sumMinMax = 0;
+    sumCombinations = 0;
+    sumAllTogether = 0;
   }
   
   // ---------- drawing the form ----------
@@ -93,6 +119,28 @@ class jambGrid{
   triangle(x + deltaX*3 + 20, y + 10, x + deltaX*3 + 15, y + 20, x + deltaX*3 + 25, y + 20);
   triangle(x + deltaX*3 + 30, y + 10, x + deltaX*3 + 40, y + 10, x + deltaX*3 + 35, y + 20);
   
+  // showing player's results
+  for(int i = 0; i < numRows - 1; ++i){
+    if(i == 6 || i == 9 || i == 15){
+      textFont(Font1);
+    }
+    else{
+      textFont(Font2);
+    }
+    for(int j = 0; j < numCols - 1; ++j){
+      if(jambResults[i][j] != -1){
+      text(str(jambResults[i][j]), startPointX + deltaX*(j + 1) + 30 , startPointY + deltaY*(i + 1) + 20);
+      }
+    }
+  }
+  
+  // filling sum fields
+  textFont(Font1);
+  text(str(sumNumbers), x + deltaX * numCols + 30, y + deltaY * 7 + 20);
+  text(str(sumMinMax), x + deltaX * numCols + 30, y + deltaY * 10 + 20);
+  text(str(sumCombinations), x + deltaX * numCols + 30, y + deltaY * 16 + 20);
+  text(str(sumAllTogether), x + deltaX * numCols + 30, y + deltaY * numRows + 20);
+  
   showPlayers();
   }
   // ---------- end of the form drawing ----------
@@ -108,18 +156,97 @@ class jambGrid{
     }
   }
   
-  public boolean check(){
+  // the next method returns true if mouseClick was on the form, otherwise false
+  public boolean check(int[] diceResults){
     if((mouseX > startPointX + deltaX && mouseX < startPointX + deltaX*numCols) && (mouseY > startPointY + deltaY && mouseY < startPointY + deltaY*numRows)){
       println("Writing into form");
       int column = (mouseX - deltaX - startPointX)/deltaX;
       int row = (mouseY - deltaY - startPointY)/deltaY;
       println("field: " + str(row) + " " + str(column));
+      // first check if the clicked field is empty
+      if(!checkField(row, column)){
+        println("Field not ok");
+        return true;
+      }
+      // for coumn 1 and 2, check if the previous field is filled
+      if(column == 0 || column == 1){
+        if(!checkColumn(row, column)){
+          println("Field not ok");
+          return true;
+        }
+      }
+      println("Field ok");
+      if(row <= 5){
+        updateFieldWithNumbers(row, column, diceResults);
+      }
+      
+      if(row == 7 || row == 8){
+        updateMinMax(row, column, diceResults);
+      }
       return true;
     }
     else{
       println("not in the form");
       return false;
     }
+  }
+  
+  public boolean checkField(int row, int column){
+    if(jambResults[row][column] != -1){
+      return false;
+    }
+    else{
+      return true;
+    }
+  }
+  
+  public boolean checkColumn(int row, int column){
+    // the first column --> the field above the current field must be filled
+    if(column == 0){
+      if(row == 0){
+        return true;
+      }
+      if(jambResults[row - 1][column] != -1){
+        return true;
+      }
+    }
+    
+    if(column == 1){
+      if(row == numRows - 2){
+        return true;
+      }
+      if(jambResults[row + 1][column] != -1){
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  public void updateFieldWithNumbers(int row, int column, int[] diceResults){
+    jambResults[row][column] = (row + 1)* diceResults[row];
+    // update the sum of the column
+    jambResults[6][column] += jambResults[row][column];
+    sumNumbers += jambResults[row][column];
+    sumAllTogether += jambResults[row][column];
+    
+    if(jambResults[6][column] >= 60){
+      jambResults[6][column] += 30;
+      sumNumbers += 30;
+      sumAllTogether += 30;
+    }
+  }
+  
+  public void updateMinMax(int row, int column, int[] diceResults){
+     int sum = 0;
+     for(int i = 0; i < diceResults.length; ++i){
+       sum += diceResults[i];
+     }
+     
+     jambResults[row][column] = sum;
+     
+     // Mirnic, ovdje sam stala
+     //if  
   }
   
   // ispisuje sve igrace i igraca koji je na potezu

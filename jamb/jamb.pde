@@ -4,7 +4,7 @@ final int NUM_SIDES = 6;   //Sides on the dice
 final int NUM_DICE = 5;    //The number of dice used
 
 /***  Variables  ***/
-int[] rolls = new int[NUM_DICE]; //array to store dice roll
+//int[] rolls = new int[NUM_DICE]; //array to store dice roll
 int brojac = 0, brIgraca, rezultat[] = {0,0,0,0,0,0}; 
 final StringList ids = new StringList( new String[] {} );
 StringList players = new StringList();
@@ -136,6 +136,22 @@ void unosIgraca(int index){
    }
 }
 
+// method to check the result
+void checkCurrentResult(){
+  restoreResult();
+  for(int i = 0; i < NUM_DICE; ++i){
+    int dieResult = dice[i].dieNumber;
+    rezultat[dieResult - 1] += 1;
+  }
+}
+
+// method to reset the result to zero when changing player on turn
+void restoreResult(){
+  for(int i = 0; i < NUM_DICE; ++i){
+    rezultat[i] = 0;
+  }
+}
+
 void draw() {
   background(220, 220, 220);
   for ( int d = 0; d < NUM_DICE; d++) {
@@ -155,7 +171,10 @@ void mousePressed() {
       dice[i].ChangeRollingDieProperty();
     }
   }
-  if(gameInfo[playerOnTurnIndex].check()){
+  
+  // update results before sending it to the form
+  checkCurrentResult();
+  if(gameInfo[playerOnTurnIndex].check(rezultat)){
     return;
   }
 }
@@ -167,6 +186,7 @@ void keyPressed(){
         for(int i=0;i<5;i++)
         {
           dice[i].RollTheDie();
+          println(dice[i].dieNumber);
         }
         rollingLeft -= 1;
       }
@@ -182,16 +202,8 @@ void keyPressed(){
        }
        
        //zbroji rezultat
-       for(int i = 0; i < NUM_DICE; i++)
-       { 
-          if(rolls[i] == 1) rezultat[0]++;
-          if(rolls[i] == 2) rezultat[1]++;
-          if(rolls[i] == 3) rezultat[2]++;
-          if(rolls[i] == 4) rezultat[3]++;
-          if(rolls[i] == 5) rezultat[4]++;
-          if(rolls[i] == 6) rezultat[5]++;
-         //rezultat = rezultat + rolls[i];
-       } 
+       checkCurrentResult();
+       
        for(int i = 0; i < 6; i++)
        { println("imamo " + rezultat[i] + " kocaka broj " + (i+1));
        }
