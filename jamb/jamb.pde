@@ -21,7 +21,7 @@ Die[] dice = new Die[5];
 jambGrid[] gameInfo;
 
 void setup() {
-  size(700, 700);
+  size(800, 700);
   unosBrojaIgraca();
   gameInfo = new jambGrid[brIgraca];
   for(int i = 0; i < brIgraca; i++)
@@ -34,7 +34,8 @@ void setup() {
   playerOnTurnIndex = 0;
   println("Na redu je " + playerOnTurn);
   
-  final float X_SPACING = (float)width/NUM_DICE; //X spacing of the dice
+  //final float X_SPACING = (float)width/NUM_DICE; //X spacing of the dice
+  final float X_SPACING = 130;
   DIE_SIZE = X_SPACING*0.5; //width and height of one die
   float dieY = 10;
   //message_draw("Kliknite za bacanje!");
@@ -111,9 +112,14 @@ void unosBrojaIgraca(){
  
 }
 void unosIgraca(int index){
-   final String id = showInputDialog("Unesite ime igrača:");
+   final String id = showInputDialog("Unesite ime igrača (najviše 8 znakova):");
  
   if (id == null)   exit();
+  
+  else if(id.length() > 8){
+    showMessageDialog(null, "Ime može imati najviše 8 znakova.", "Alert", ERROR_MESSAGE);
+    unosIgraca(index);
+  }
  
   else if ("".equals(id)){
     showMessageDialog(null, "Prazan unos! Molimo unesite ime igrača.", 
@@ -132,7 +138,7 @@ void unosIgraca(int index){
     "Info", INFORMATION_MESSAGE);
     ids.append(id);
     players.append(id);
-    gameInfo[index] = new jambGrid(index, 17, 4, 70, 30, 150, 10);
+    gameInfo[index] = new jambGrid(id, index, 17, 4, 70, 30, 130, 10);
    }
 }
 
@@ -154,6 +160,7 @@ void restoreResult(){
 
 void draw() {
   background(220, 220, 220);
+  //background(176, 224, 230);
   for ( int d = 0; d < NUM_DICE; d++) {
     dice[d].DrawDie();
   }

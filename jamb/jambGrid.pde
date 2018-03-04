@@ -1,6 +1,7 @@
 class jambGrid{
   
   // variables needed for the form
+  String name;
   int numRows;
   int numCols;
   int[][] jambResults;
@@ -25,7 +26,8 @@ class jambGrid{
   int[] thirtyPointsAdded;
   // 
   
-  jambGrid(int _player, int _numRows, int _numCols, int _deltaX, int _deltaY, int _startPointX, int _startPointY){
+  jambGrid(String _name, int _player, int _numRows, int _numCols, int _deltaX, int _deltaY, int _startPointX, int _startPointY){
+    name = _name;
     player = _player;
     numRows = _numRows;
     numCols = _numCols;
@@ -93,7 +95,8 @@ class jambGrid{
   
   // putting text to the first column
   textFont(Font1);
-  text("Player " + str(player + 1), x + 7, y + 20);
+  //text("Player " + str(player + 1), x + 7, y + 20);
+  text(name, x + 7, y + 20);
   for(int i = 1; i <= 6; ++i){
     text(str(i), x + 25, y + (deltaY *i) + 20);
   }
@@ -419,20 +422,22 @@ class jambGrid{
   // ispisuje sve igrace i igraca koji je na potezu
   void showPlayers() {
   textAlign(LEFT);
-  text("Popis igraca:", 3*width/4,30);
+  text("Popis igraca:", startPointX + deltaX * numCols + 100,30);
+  text("Broj bodova:", startPointX + deltaX * numCols + 250, 30);
   
   for(int i = 0; i < brIgraca; i++)
   {
     String item = ids.get(i);
     textAlign(LEFT);
-    text(item, 3*width/4,30+(i+1)*20);
+    text(item, startPointX + deltaX * numCols + 100,30+(i+1)*20);
+    text(str(gameInfo[i].sumAllTogether), startPointX + deltaX * numCols + 250, 30 + (i + 1) * 20);
   }
   
   textAlign(LEFT);
-  text("Trenutno na potezu:", 3*width/4,230);
+  text("Trenutno na potezu:", startPointX + deltaX * numCols + 100,230);
   String currentPlayer = players.get(playerOnTurnIndex);
   textAlign(LEFT);
-  text(currentPlayer, 3*width/4,250);
+  text(currentPlayer, startPointX + deltaX * numCols + 100,250);
 }
   
 }
