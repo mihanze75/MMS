@@ -47,7 +47,7 @@ class Game
     
     for(int i=0;i<numPlayers;i++)
     {
-      gameInfo[i] = new jambGrid(playersName.get(i), i, 17, 4, 80, 30, 130, 10);
+      gameInfo[i] = new jambGrid(playersName.get(i), i, 17, 4, 70, 30, 130, 10);
     }
   }
   

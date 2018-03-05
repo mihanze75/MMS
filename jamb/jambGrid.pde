@@ -100,7 +100,7 @@ class jambGrid{
   for(int i = 1; i <= 6; ++i){
     text(str(i), x + 25, y + (deltaY *i) + 20);
   }
-  text("Ukupno", x + 7, y + (deltaY * 7) + 20);
+  text("Ukupno", startPointX + 7, y + (deltaY * 7) + 20);
   text("Max", x + 20, y + (deltaY * 8) + 20);
   text("Min", x + 20, y + (deltaY * 9) + 20);
   text("Ukupno", x + 7, y + (deltaY * 10) + 20);
