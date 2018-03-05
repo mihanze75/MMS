@@ -14,6 +14,8 @@ class Game
   int[] currentResult = {0,0,0,0,0,0};
   emptyDie[] emptyDice = new emptyDie[numDice];
   boolean nacrtano;
+  boolean gameOver;
+  String winner;
   
   int maxMoves;
   int movesPlayed;
@@ -29,6 +31,7 @@ class Game
     dice = new Die[numDice];
     dieSize = ((float)width/numDice)*0.5;
     playerOnGridShown = 0;
+    gameOver = false;
     
     
     //inicijaliziramo 5 kocaka
@@ -55,7 +58,7 @@ class Game
     
     nacrtano = false;
     // change if a new row or column is added
-    maxMoves = 39;
+    maxMoves = 1;
     movesPlayed = 0;
   }
   
@@ -140,7 +143,8 @@ class Game
              movesPlayed += 1;
              println("movesPlayed: " + movesPlayed);
              if(movesPlayed == maxMoves * numPlayers){
-               // gameOver, funkcija za kraj
+               gameOver = true;
+               winner = playerOnTurn;
                println("game over");
              }
              if(playerOnTurnIndex == numPlayers - 1){
@@ -186,6 +190,8 @@ class Game
   
   void DrawGame()
   {
+    if(!gameOver)
+    {
     background(51, 153, 255);
     if(playerOnTurnIndex != playerOnGridShown && nacrtano){
       stopDrawing(2000);
@@ -216,6 +222,22 @@ class Game
     }
     printUsedDices();*/
     printNumberOfRollingsLeft();
+    }
+    else
+    {
+      background(51, 153, 255);
+      Drawer dr = new Drawer();
+      dr.makeText("Igra je završena!",  40, 255, width/2, height/3);
+      dr.makeText("Rezultat:",30,255,width/2,height/3+50);
+      int y = 50+10+30;
+      for(int i=0;i<numPlayers;i++)
+      {
+        dr.makeText(playersName.get(i),25,255,width/2-60,height/3+y);
+        dr.makeText(str(gameInfo[i].sumAllTogether),25,255,width/2+90,height/3+y);
+        y=y+20+10;
+        
+      }
+    }
   
 }
     void showPlayers() {
