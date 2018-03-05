@@ -13,7 +13,10 @@ class Game
   jambGrid[] gameInfo;
   int[] currentResult = {0,0,0,0,0,0};
   emptyDie[] emptyDice = new emptyDie[numDice];
-  boolean nacrtano = false;
+  boolean nacrtano;
+  
+  int maxMoves;
+  int movesPlayed;
   
   //konstruktor, postavlja početno stanje igre
   Game(int _numPlayers, StringList _playersName)
@@ -49,6 +52,11 @@ class Game
     {
       gameInfo[i] = new jambGrid(playersName.get(i), i, 17, 4, 70, 30, 130, 10);
     }
+    
+    nacrtano = false;
+    // change if a new row or column is added
+    maxMoves = 39;
+    movesPlayed = 0;
   }
   
   // method to check the result
@@ -129,6 +137,12 @@ class Game
          checkCurrentResult();
          if(rollingLeft < 3){
            if(gameInfo[playerOnTurnIndex].check(currentResult)){
+             movesPlayed += 1;
+             println("movesPlayed: " + movesPlayed);
+             if(movesPlayed == maxMoves * numPlayers){
+               // gameOver, funkcija za kraj
+               println("game over");
+             }
              if(playerOnTurnIndex == numPlayers - 1){
                playerOnTurnIndex = 0;
              }
