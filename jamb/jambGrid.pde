@@ -149,7 +149,6 @@ class jambGrid{
   text(str(sumCombinations), x + deltaX * numCols + 30, y + deltaY * 16 + 20);
   text(str(sumAllTogether), x + deltaX * numCols + 30, y + deltaY * numRows + 20);
   
-  showPlayers();
   }
   // ---------- end of the form drawing ----------
   
@@ -418,26 +417,5 @@ class jambGrid{
     sumCombinations += jambResults[row][column];
     sumAllTogether += jambResults[row][column];
   }
-  
-  // ispisuje sve igrace i igraca koji je na potezu
-  void showPlayers() {
-  textAlign(LEFT);
-  text("Popis igraca:", startPointX + deltaX * numCols + 100,30);
-  text("Broj bodova:", startPointX + deltaX * numCols + 250, 30);
-  
-  for(int i = 0; i < brIgraca; i++)
-  {
-    String item = ids.get(i);
-    textAlign(LEFT);
-    text(item, startPointX + deltaX * numCols + 100,30+(i+1)*20);
-    text(str(gameInfo[i].sumAllTogether), startPointX + deltaX * numCols + 250, 30 + (i + 1) * 20);
-  }
-  
-  textAlign(LEFT);
-  text("Trenutno na potezu:", startPointX + deltaX * numCols + 100,230);
-  String currentPlayer = players.get(playerOnTurnIndex);
-  textAlign(LEFT);
-  text(currentPlayer, startPointX + deltaX * numCols + 100,250);
-}
-  
+   
 }
