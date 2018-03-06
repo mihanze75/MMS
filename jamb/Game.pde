@@ -58,7 +58,7 @@ class Game
     
     nacrtano = false;
     // change if a new row or column is added
-    maxMoves = 1;
+    maxMoves = 39;
     movesPlayed = 0;
   }
   

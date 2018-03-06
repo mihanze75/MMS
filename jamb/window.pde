@@ -64,7 +64,7 @@ class Window{
   // use text boxes to get player names 
    void drawTextFields(){
     for (int i = 0; i < brIgraca; ++i) {
-      names[i] = controlP5.addTextfield("Player"+i)
+      names[i] = controlP5.addTextfield("Igrac"+(i+1))
         .setPosition(width/2, height/4+80+i*50)
         .setSize(150, 30)
         .setFont(drawer.getControlFont(20));
@@ -90,7 +90,7 @@ class Window{
       String s1 = "Jamb je zabavna igra koju moze igrati 2-6 igraca.\nIgra se s pet kockica cije kombinacije se upisuju u tablicu.\nIgraci bacaju 5 kockica u 3 pokusaja.\nRezultate bacanja upisuju u tablicu po posebnom rasporedu.\nZbroj bodova na kraju odreduje i pobjednika. U prvi stupac bodove upisujete\nsamo od gore prema dolje.\nU drugom stupcu upisujete ih samo od dolje prema gore,\n a u trecem proizvoljno.";
       drawer.makeTextRules(s1, 20, 255, 20, 50);
       drawer.makeTextRules("BODOVI:", 20, 255, 20, 350);
-      String s2 = "1 - 6 = 1*broj jedinica, ... , 6*broj sestica\nmax = cim veci zbroj\nmin = cim manji zbroj\ntris = zbroj 3 ista broja + 10\nskala = 30(mala) ili 40(velika)\nfull = par + tris (zbroj + 30b)\npoker = cetiri ista (zbroj + 40b)\njamb = zbroj 5 istih + 50b ";
+      String s2 = "1 - 6 = 1*broj jedinica, ... , 6*broj sestica\nmax = cim veci zbroj\nmin = cim manji zbroj\ntris = zbroj 3 ista broja + 10\nskala = 5 u nizu (40b)\nfull = par + tris (zbroj + 30b)\npoker = cetiri ista (zbroj + 40b)\njamb = zbroj 5 istih + 50b ";
       drawer.makeTextRules(s2, 20, 255, 20, 380);
     }
   }
